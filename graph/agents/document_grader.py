@@ -21,9 +21,11 @@ def grader_node(state, use_saved_data: bool = False):
         print("From saved data!")
         with open(filename, 'r') as file:
             saved_data = json.load(file)
-            state['content'] = saved_data["content"]
-            state['grading_score'] = saved_data["grading_score"]
-            return state
+            return {
+            'content' : saved_data["content"],
+            'grading_score' :  round(saved_data["grading_score"]),
+            "search_number": state["search_number"] + 1,
+            }
         
     content = "\n\n".join(state['content'] or [])
     messages = [
@@ -59,4 +61,3 @@ def grader_node(state, use_saved_data: bool = False):
             "content": relevant_content,
             "grading_score": round(grading_score),
             }
-

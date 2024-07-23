@@ -22,7 +22,7 @@ def generator_node(state, use_saved_data: bool = False):
         print("From saved data!")
         with open(filename, 'r') as file:
             saved_data = json.load(file)
-            return {"generated": saved_data["generated"], "revision_number": state.get("revision_number", 1)}
+            return {"generated": saved_data["generated"], "revision_number": state.get("revision_number", 1) + 1}
         
     # Combine all content into a single string
     content = "\n\n".join(state['content'] or [])

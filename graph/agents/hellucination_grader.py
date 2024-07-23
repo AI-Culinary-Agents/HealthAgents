@@ -5,7 +5,8 @@ from langchain_core.messages import SystemMessage
 import re
 
 load_dotenv()
-
+# DEBUG need to calculate hellucination score earlier and 
+# not sure tho 
 from .prompts import HALLUCINATION_GRADER_PROMPT
 
 def reviewer_node(state, use_saved_data: bool = False):
@@ -22,13 +23,10 @@ def reviewer_node(state, use_saved_data: bool = False):
         print("From saved data!")
         with open(filename, 'r') as file:
             saved_data = json.load(file)
-            state['final_review'] = saved_data["review"]
-            state['hellucination_score'] = saved_data["hellucination_score"]
-            state['grading_score'] = saved_data.get("grading_score", state['grading_score'])
             return {
-        "final_review": assessments,
-        "hellucination_score": state["hellucination_score"] + round(hellucination_score),
-        'generated': state['generated']
+        "final_review": saved_data["review"],
+        "hellucination_score": saved_data["hellucination_score"] + 50,
+        'generated': saved_data['generated']
     }
     
     # Combine content and generated text for the prompt

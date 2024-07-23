@@ -1,6 +1,6 @@
-# RecipeAgents
+# Health Agents
 
-RecipeAgents is a personalized meal plan recommendation system that generates tailored meal plans based on user dietary preferences and available ingredients. This project utilizes the LangGraph framework for defining agent workflows and the Tavily API for fetching recipe data.
+Health Agents is a personalized meal plan recommendation system that generates tailored meal plans based on user dietary preferences and available ingredients. This project utilizes the LangGraph framework for defining agent workflows and the Tavily API for fetching recipe data.
 
 ## Table of Contents
 
@@ -152,15 +152,22 @@ def reviewer_node(state, use_saved_data: bool = False):
 2. Install the required dependencies:
 
 ```sh
- # Run from root directory
+# Create Virtual Enviornment in Root
+python -m venv venv
+ # From root directory run VENV
+ # on Mac
+source venv/bin/activate
+# on Windows
+venv\Scripts\activate
+ # install frontend and server dependencies
  npm run install:all
- # For Python
+ # Depencies for virtual env
  pip install -r requirements.txt
 ```
 
-## Usage
+## How to Run the Application
 
-1. Create .env file in root directory with your API Keys like this :
+### 1. Create .env file in root directory with your API Keys like this
 
 ```sh
  # Create env file with terminal
@@ -170,22 +177,29 @@ TAVILY_API_KEY=XXXXXXXXXX
 OPENAI_API_KEY=XXXXXXXXXX
 ```
 
-1. Run virtual enviornment
-
-```sh
- # From root directory
- # on Mac
-source venv/bin/activate
-# on Windows
-venv\Scripts\activate
-```
-
-2. Run flask server and frontend at once
+### 2. Start the Flask Server and Frontend Simultaneously
 
 ```sh
  # From root directory
 npm run start:all
 ```
+
+### 3. Open the Localhost Link.
+
+- Open your browser and navigate to the localhost link provided by the server.
+
+### 4. Enter Your Information.
+
+- Type in your dietary preferences, goals, available ingredients, and other relevant information in the chatbox at the bottom of the page.
+
+### 5. Wait for Processing.
+
+- You will be temporarily unable to interact with the chatbox while your request is being processed. A status screen will appear to show the progress.
+
+### 6. You will recieve the generated result with a grading score and hallucination score!
+
+- Example Output
+  ![Example Output](./website/public/exampleOutput.png "Example Output")
 
 ## Project Structure
 
