@@ -7,7 +7,7 @@ load_dotenv()
 
 from .prompts import RESEARCH_PROMPT
 
-def research_plan_node(state, use_saved_data: bool = False):
+def research_plan_node(state):
     from graph import AgentState, model, Queries, tavily  # avoid circular import
     from graph.status_updates import update_server_during_research
     directory = os.environ.get("DOCUMENTS_DATA_DIR", "../tests/documents_save")
@@ -17,7 +17,7 @@ def research_plan_node(state, use_saved_data: bool = False):
         os.makedirs(directory)
     
     # use saved data if available
-    if use_saved_data and os.path.exists(filename):
+    if state["use_saved_data"] and os.path.exists(filename):
         print("From saved data!")
         with open(filename, 'r') as file:
             saved_data = json.load(file)
@@ -66,3 +66,6 @@ def research_plan_node(state, use_saved_data: bool = False):
 #     }
 
 #     print(research_plan_node(state, use_saved_data=False))
+
+
+print("-----RESEARCHER------")

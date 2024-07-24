@@ -7,7 +7,7 @@ load_dotenv()
 
 from .prompts import GRADER_PROMPT
 
-def grader_node(state, use_saved_data: bool = False):
+def grader_node(state):
     from graph import model  # avoid circular import
     from graph.status_updates import update_server_during_grader
     directory = os.environ.get("GENERATED_DATA_DIR", "../tests/relevant_docs_save")
@@ -17,7 +17,7 @@ def grader_node(state, use_saved_data: bool = False):
         os.makedirs(directory)
     
     # Use saved data if available
-    if use_saved_data and os.path.exists(filename):
+    if state["use_saved_data"] and os.path.exists(filename):
         print("From saved data!")
         with open(filename, 'r') as file:
             saved_data = json.load(file)
@@ -54,7 +54,7 @@ def grader_node(state, use_saved_data: bool = False):
     
     print('---')
     print(grading_score)
-    print("---GRADER---")
+    print("------GRADER------")
     
     return {
             "search_number": state["search_number"] + 1,

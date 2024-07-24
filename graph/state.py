@@ -19,3 +19,5 @@ class AgentState(TypedDict):
 # Amount of generations throughout workflow with a limit 
     revision_number: int
     max_revisions: int
+# Use saved data if available
+    use_saved_data: bool
