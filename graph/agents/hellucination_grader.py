@@ -9,7 +9,7 @@ load_dotenv()
 # not sure tho 
 from .prompts import HALLUCINATION_GRADER_PROMPT
 
-def reviewer_node(state, use_saved_data: bool = False):
+def reviewer_node(state):
     from graph import model  # avoid circular import
     from graph.status_updates import update_server_during_reviewer
     directory = os.environ.get("REVIEW_DATA_DIR", "../tests/review_save")
@@ -19,7 +19,7 @@ def reviewer_node(state, use_saved_data: bool = False):
         os.makedirs(directory)
     
     # Use saved data if available
-    if use_saved_data and os.path.exists(filename):
+    if state["use_saved_data"] and os.path.exists(filename):
         print("From saved data!")
         with open(filename, 'r') as file:
             saved_data = json.load(file)
@@ -57,7 +57,7 @@ def reviewer_node(state, use_saved_data: bool = False):
     print(hellucination_score)
     print("ASSESMENTS:", assessments)
     print("----------")
-    print("---REVIEWER---")
+    print("------REVIEWER------")
     
     return {
         "final_review": assessments,

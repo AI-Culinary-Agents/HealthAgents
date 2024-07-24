@@ -1,12 +1,12 @@
 import requests
 
 def send_data_to_server(data):
-    print("Sending data to server:", data)
+    print("SENDING STATUS UPDATE TO SERVER:", data)
     response = requests.post('http://127.0.0.1:5000/api/processed', json=data)
     if response.status_code == 200:
-        print("Processed data sent successfully:", response.json())
+        print("STATUS SENT SUCCESFULLY", response.json())
     else:
-        print("Error sending processed data:", response.status_code, response.text)
+        print("ERROR SENDING STATUS:", response.status_code, response.text)
 
 def update_server_with_status(phase, message):
     data = {

@@ -1,17 +1,7 @@
-import requests
-import json
-import os
 from graph.agents import get_plan_node, get_research_plan_node, get_grader_node, get_generator_node, get_reviewer_node
 from langgraph.graph import StateGraph, END
 from langgraph.checkpoint.sqlite import SqliteSaver
-from graph import AgentState  # avoid circular import
-def send_data_to_server(data):
-    print("Sending data to server:", data) 
-    response = requests.post('http://127.0.0.1:5000/api/processed', json=data)
-    if response.status_code == 200:
-        print("Processed data sent successfully:", response.json())
-    else:
-        print("Error sending processed data:", response.status_code, response.text)
+from graph import AgentState, send_data_to_server, retrieve_final_data  # avoid circular import
 
 def process_user_input(user_input):
     print("Starting process_user_input with:", user_input)  
@@ -36,14 +26,14 @@ def process_user_input(user_input):
     workflow.add_edge("generate", "review")
 
     def enough_content(state):
-        if state['grading_score'] > 20 and state["search_number"] < state["max_searches"]:
+        if state['grading_score'] >= 20 and state["search_number"] < state["max_searches"]:
             return "research_plan"
         return "generate"
     
     workflow.add_conditional_edges("grader", enough_content, {"research_plan": "research_plan", "generate": "generate"})
 
     def should_continue(state):
-        if state['hellucination_score'] < 50 and state["revision_number"] < state["max_revisions"]:
+        if state['hellucination_score'] <= 50 and state["revision_number"] < state["max_revisions"]:
             return "generate"
         return END
 
@@ -54,12 +44,8 @@ def process_user_input(user_input):
 
     thread = {"configurable": {"thread_id": "1"}}
 
-    # Process the user input
-    processed_result = f"Processed: {user_input}"  
-    print("Processed result:", processed_result)
-
     state = AgentState(
-        task=processed_result,
+        task=user_input,
         plan="",
         generated="", 
         content=[],
@@ -70,35 +56,25 @@ def process_user_input(user_input):
         search_number=0,
         max_searches=1, # Adjust (2-3 recommendeded)
         max_revisions=1, # Adjust (2-3 recommendeded)
+        use_saved_data=True
     )
 
     # Stream the Graph
     for event in graph.stream(state, thread):
-        print('------------------')
         # for key, value in event.items():
-            # print(key, value)
+        print('------------------')
+        # print(key, value)
+        print('------------------')
            
 
 
-    # Retrieve the review data from the file
-    directory = os.environ.get("REVIEW_DATA_DIR", "../tests/review_save")
-    filename = os.path.join(directory, "review_results.json")
-    with open(filename, 'r') as file:
-        saved_data = json.load(file)
-
-    # Prepare the data to send
-    data_to_send = {
-        "generated": saved_data["generated"],
-        "grading_score": saved_data["grading_score"],
-        "hellucination_score": saved_data["hellucination_score"],
-    }
-    print("saved generation", saved_data["generated"])
+    results = retrieve_final_data()
 
     # Send the saved data to the server
-    send_data_to_server(data_to_send)
+    send_data_to_server(results)
 
     # Return the processed result
-    return data_to_send  
+    return results 
 
 if __name__ == "__main__":
     # standalone Testing
