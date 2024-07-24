@@ -1,21 +1,25 @@
+// App.tsx
+import { useEffect, useState } from "react"
 import Sidebar from "./components/Sidebar"
 import ChatWindow from "./components/ChatWindow"
-import { useEffect, useState } from "react"
+import LoadingScreen from "./components/LoadingScreen"
+import { initializeEventSource } from "./Utility/utils"
 
 const App = () => {
   const [isWaiting, setIsWaiting] = useState(false)
   const [status, setStatus] = useState<string | null>(null)
 
   useEffect(() => {
-    const eventSource = new EventSource("http://127.0.0.1:5000/api/updates")
-
-    eventSource.onmessage = (event) => {
-      const data = JSON.parse(event.data)
-      setStatus(data.status + "...")
-    }
+    const cleanupEventSource = initializeEventSource(
+      "http://127.0.0.1:5000/api/updates",
+      // @ts-expect-error not sure yet
+      (data: { status: string }): void => {
+        setStatus(data.status + "...")
+      }
+    )
 
     return () => {
-      eventSource.close()
+      cleanupEventSource()
     }
   }, [])
 
@@ -42,19 +46,7 @@ const App = () => {
             Refresh to start a new conversation
           </p>
         </div>
-        {isWaiting && (
-          <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-            <div className="bg-white p-6 rounded shadow-md text-center">
-              <div className="flex justify-center mb-4">
-                <div className="loader ease-linear rounded-full border-8 border-t-8 border-gray-200 h-10 w-10"></div>
-              </div>
-              <p>{status}</p>
-              <p className="mt-2 text-sm text-gray-500">
-                Do not reload the page, or you will lose the conversation.
-              </p>
-            </div>
-          </div>
-        )}
+        {isWaiting && <LoadingScreen status={status} />}
       </main>
     </div>
   )
