@@ -14,7 +14,7 @@ Health Agents is a personalized meal plan recommendation system that generates t
 - [Getting Started](#getting-started)
   - [Prerequisites](#prerequisites)
   - [Installation](#installation)
-  - [Usage](#usage)
+- [How to Run the Application](#how-to-run-the-application)
 - [Project Structure](#project-structure)
 - [Contributing](#contributing)
 - [License](#license)

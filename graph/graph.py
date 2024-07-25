@@ -1,6 +1,7 @@
+from psycopg_pool import ConnectionPool
+from .postgres_saver import PostgresSaver
 from graph.agents import get_plan_node, get_research_plan_node, get_grader_node, get_generator_node, get_reviewer_node
 from langgraph.graph import StateGraph, END
-from langgraph.checkpoint.sqlite import SqliteSaver
 from graph import AgentState, send_data_to_server, retrieve_final_data  # avoid circular import
 
 def process_user_input(user_input):
@@ -39,8 +40,14 @@ def process_user_input(user_input):
 
     workflow.add_conditional_edges("review", should_continue, {"generate": "generate", END: END})
 
-    memory = SqliteSaver.from_conn_string(":memory:")
-    graph = workflow.compile(checkpointer=memory)
+    # Setup PostgreSQL checkpointer with sync connection pool
+    DB_URI = "postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"
+    pool = ConnectionPool(conninfo=DB_URI, max_size=20)
+    postgres_checkpointer = PostgresSaver(sync_connection=pool)
+
+    postgres_checkpointer.create_tables(pool)
+    
+    graph = workflow.compile(checkpointer=postgres_checkpointer)
 
     thread = {"configurable": {"thread_id": "1"}}
 
@@ -54,19 +61,15 @@ def process_user_input(user_input):
         final_review="",
         hellucination_score=0,  
         search_number=0,
-        max_searches=1, # Adjust (2-3 recommendeded)
-        max_revisions=1, # Adjust (2-3 recommendeded)
+        max_searches=1, # Adjust (2-3 recommended)
+        max_revisions=1, # Adjust (2-3 recommended)
         use_saved_data=True
     )
 
-    # Stream the Graph
     for event in graph.stream(state, thread):
-        # for key, value in event.items():
         print('------------------')
-        # print(key, value)
+        print(event)
         print('------------------')
-           
-
 
     results = retrieve_final_data()
 
