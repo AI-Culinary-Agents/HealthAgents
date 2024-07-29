@@ -21,3 +21,12 @@ class AgentState(TypedDict):
     max_revisions: int
 # Use saved data if available
     use_saved_data: bool
+    id: str
+    channel_values: dict
+    v: int
+    ts: str
+    channel_versions: dict
+    versions_seen: dict
+    pending_sends: List[str]
+    
+    

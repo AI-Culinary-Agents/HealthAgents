@@ -14,7 +14,7 @@ def update_server_with_status(phase, message, delay=2):
         "phase": phase,
         "status": message
     }
-    time.sleep(delay)  #  delay to simulate
+    # time.sleep(delay)  #  delay to simulate
     send_data_to_server(data)
 
 def update_server_during_planner():

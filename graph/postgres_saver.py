@@ -1,5 +1,16 @@
+"""Implementation of a langgraph checkpoint saver using Postgres."""
 from contextlib import asynccontextmanager, contextmanager
-from typing import Any, AsyncGenerator, AsyncIterator, Generator, Optional, Union, Tuple, List, Sequence
+from typing import (
+    Any,
+    AsyncGenerator,
+    AsyncIterator,
+    Generator,
+    Optional,
+    Union,
+    Tuple,
+    List,
+    Sequence,
+)
 
 import psycopg
 from langchain_core.runnables import RunnableConfig
@@ -139,8 +150,6 @@ class PostgresSaver(BaseCheckpointSaver):
         with _get_sync_connection(connection) as conn:
             with conn.cursor() as cur:
                 cur.execute(PostgresSaver.CREATE_TABLES_QUERY)
-                conn.commit()  # Ensure the changes are committed
-                print("Tables created successfully.")
 
     @staticmethod
     async def acreate_tables(
@@ -469,10 +478,10 @@ class PostgresSaver(BaseCheckpointSaver):
                         }
                         if parent_ts
                         else None,
-                        pending_writes=[
-                            (task_id, channel, self.serde.loads(value))
-                            for task_id, channel, value in cur
-                        ],
+                        # pending_writes=[
+                        #     (task_id, channel, self.serde.loads(value))
+                        #     for task_id, channel, value in cur
+                        # ],
                     )
 
     async def aget_tuple(self, config: RunnableConfig) -> Optional[CheckpointTuple]:
@@ -539,10 +548,10 @@ class PostgresSaver(BaseCheckpointSaver):
                         }
                         if parent_ts
                         else None,
-                        pending_writes=[
-                            (task_id, channel, self.serde.loads(value))
-                            async for task_id, channel, value in cur
-                        ],
+                        # pending_writes=[
+                        #     (task_id, channel, self.serde.loads(value))
+                        #     async for task_id, channel, value in cur
+                        # ],
                     )
 
     def _search_where(
