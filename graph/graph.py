@@ -1,8 +1,8 @@
 from psycopg_pool import ConnectionPool
-from .postgres_saver import PostgresSaver
 from graph.agents import get_plan_node, get_research_plan_node, get_grader_node, get_generator_node, get_reviewer_node
 from langgraph.graph import StateGraph, END
 from graph import AgentState, send_data_to_server, retrieve_final_data  # avoid circular import
+from .postgres_saver import PostgresSaver
 
 def process_user_input(user_input):
     print("Starting process_user_input with:", user_input)  
@@ -63,7 +63,7 @@ def process_user_input(user_input):
         search_number=0,
         max_searches=1, # Adjust (2-3 recommended)
         max_revisions=1, # Adjust (2-3 recommended)
-        use_saved_data=True
+        use_saved_data=False 
     )
 
     for event in graph.stream(state, thread):
