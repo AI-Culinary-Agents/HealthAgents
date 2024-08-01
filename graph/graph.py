@@ -63,7 +63,7 @@ def process_user_input(user_input):
         search_number=0,
         max_searches=1, # Adjust (2-3 recommended)
         max_revisions=1, # Adjust (2-3 recommended)
-        use_saved_data=True
+        use_saved_data=False 
     )
 
     for event in graph.stream(state, thread):

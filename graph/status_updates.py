@@ -9,12 +9,12 @@ def send_data_to_server(data):
     else:
         print("ERROR SENDING STATUS:", response.status_code, response.text)
 
-def update_server_with_status(phase, message, delay=2):
+def update_server_with_status(phase, message, delay=5):
     data = {
         "phase": phase,
         "status": message
     }
-    # time.sleep(delay)  #  delay to simulate
+    time.sleep(delay)  #  delay to simulate
     send_data_to_server(data)
 
 def update_server_during_planner():
