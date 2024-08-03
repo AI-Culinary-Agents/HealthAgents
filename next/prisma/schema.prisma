@@ -17,4 +17,30 @@ model User {
   avatar    String?
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+  threads   Thread[] @relation("UserThreads")
+  messages  Message[] @relation("UserMessages")
+}
+
+model Thread {
+  id         Int       @id @default(autoincrement())
+  name       String
+  created_by String
+  created_at DateTime  @default(now())
+  messages   Message[]
+  
+  // Relation field to reference the user who created the thread
+  user       User      @relation(fields: [created_by], references: [id], name: "UserThreads")
+}
+
+model Message {
+  id         Int       @id @default(autoincrement())
+  thread_id  Int
+  user_id    String
+  message    String
+  created_at DateTime  @default(now())
+  is_bot     Boolean   @default(false)
+  
+  // Relation fields to reference the thread and user
+  thread     Thread    @relation(fields: [thread_id], references: [id])
+  user       User      @relation(fields: [user_id], references: [id], name: "UserMessages")
 }

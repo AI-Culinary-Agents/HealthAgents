@@ -1,6 +1,4 @@
-import tailwindcss from "tailwindcss"
-import autoprefixer from "autoprefixer"
-
+/* eslint-disable import/no-anonymous-default-export */
 export default {
   plugins: {
     tailwindcss: {},
