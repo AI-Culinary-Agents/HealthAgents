@@ -117,5 +117,20 @@ dmypy.json
 # node.js
 node_modules/
 
-# temporary for branch
-Next-app
+# next.js
+.next
+/out/
+
+# misc
+.DS_Store
+*.pem
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# production
+/build
