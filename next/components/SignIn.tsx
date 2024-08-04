@@ -12,6 +12,7 @@ const SignUp = () => {
 	const router = useRouter();
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
+	const [loading, setLoading] = useState(false);
 
 	useEffect(() => {
 		setMounted(true);
@@ -44,6 +45,7 @@ const SignUp = () => {
 
 	const handleEmailSignUp = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
+		setLoading(true);
 		try {
 			console.log('Sign up form submitted');
 			console.log('Email:', email);
@@ -58,18 +60,21 @@ const SignUp = () => {
 
 			if (response.status === 201) {
 				console.log('User registered successfully');
+				// Sign in the user and redirect immediately
 				await signIn('credentials', { email, password, redirect: false });
-				router.push('/'); // Redirect to home page after sign-up
+				router.push('/');
 			} else {
 				console.error('Error registering user:', response.data.message);
+				setLoading(false); // Stop loading if there is an error
 			}
 		} catch (error) {
 			console.error('Error during email sign-up:', error);
+			setLoading(false); // Stop loading if there is an error
 		}
 	};
 
-	if (status === 'loading') {
-		return <div>Loading...</div>;
+	if (status === 'loading' || loading) {
+		return <div>Loading...</div>; // Replace with your custom loading component if needed
 	}
 
 	return (
