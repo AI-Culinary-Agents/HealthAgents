@@ -2,18 +2,17 @@
 
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import { handleEmailSignUp } from '@/utils/authHelpers';
+import { handleLogin } from '@/utils/authHelpers';
 
-const EmailSignUp = () => {
-	const [name, setName] = useState('');
+const Login = () => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
 
-	const handleSubmit = async (e: { preventDefault: () => void; }) => {
+	const handleSubmit = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
-		await handleEmailSignUp(name, email, password, router, setLoading);
+		await handleLogin(email, password, router, setLoading);
 	};
 
 	if (loading) {
@@ -24,14 +23,6 @@ const EmailSignUp = () => {
 		<form
 			onSubmit={handleSubmit}
 			className='flex flex-col w-full mt-4 space-y-4'>
-			<input
-				type='text'
-				value={name}
-				onChange={(e) => setName(e.target.value)}
-				placeholder='Name'
-				required
-				className='p-3 border rounded-md border- focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500'
-			/>
 			<input
 				type='email'
 				value={email}
@@ -57,4 +48,4 @@ const EmailSignUp = () => {
 	);
 };
 
-export default EmailSignUp;
+export default Login;

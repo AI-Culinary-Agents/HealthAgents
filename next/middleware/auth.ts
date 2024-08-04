@@ -14,6 +14,7 @@ export async function middleware(req: NextRequest) {
 		req.nextUrl.pathname.startsWith('/_next') ||
 		req.nextUrl.pathname.startsWith('/api/auth') ||
 		req.nextUrl.pathname.startsWith('/api/register') ||
+		req.nextUrl.pathname.startsWith('/api/login') ||
 		req.nextUrl.pathname === '/signup'
 	) {
 		console.log('Excluded route, continuing request');

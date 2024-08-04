@@ -1,14 +1,20 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useSession } from 'next-auth/react';
 import Image from 'next/image';
 import GoogleSignIn from '@/components/auth/GoogleSignIn';
 import EmailSignUp from '@/components/auth/EmailSignUp';
 import SignOut from '@/components/auth/SignOut';
+import Login from '@/components/auth/Login';
 
 const SignUp = () => {
 	const { data: session, status } = useSession();
+	const [activeForm, setActiveForm] = useState('signup');
+
+	const handleToggle = (formName: string) => {
+		setActiveForm((prevForm) => (prevForm === formName ? '' : formName));
+	};
 
 	if (status === 'loading') {
 		return (
@@ -38,10 +44,27 @@ const SignUp = () => {
 					</div>
 				) : (
 					<div className='space-y-4'>
-						<div className='flex justify-center'>
+						<div className='flex justify-center mb-4'>
 							<GoogleSignIn />
 						</div>
-						<EmailSignUp />
+						<div className='flex justify-center space-x-4'>
+							<button
+								className={`px-6 py-3 text-white transition-colors duration-300 bg-yellow-500 rounded hover:bg-yellow-700 ${
+									activeForm === 'signup' ? 'bg-yellow-700' : ''
+								}`}
+								onClick={() => handleToggle('signup')}>
+								Sign up with Email
+							</button>
+							<button
+								className={`px-6 py-3 text-white transition-colors duration-300 bg-yellow-500 rounded hover:bg-yellow-700 ${
+									activeForm === 'login' ? 'bg-yellow-700' : ''
+								}`}
+								onClick={() => handleToggle('login')}>
+								Log in with Email
+							</button>
+						</div>
+						{activeForm === 'signup' && <EmailSignUp />}
+						{activeForm === 'login' && <Login />}
 					</div>
 				)}
 			</div>

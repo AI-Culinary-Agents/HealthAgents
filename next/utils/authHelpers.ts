@@ -50,6 +50,39 @@ export const handleEmailSignUp = async (
 	}
 };
 
+export const handleLogin = async (
+	email: string,
+	password: string,
+	router: any,
+	setLoading: (loading: boolean) => void
+) => {
+	setLoading(true);
+	try {
+		console.log('Login form submitted');
+		console.log('Email:', email);
+		console.log('Password:', password);
+
+		const response = await axios.post('/api/login', {
+			email,
+			password,
+		});
+
+		console.log('Response data:', response.data);
+
+		if (response.status === 200) {
+			console.log('User logged in successfully');
+			await signIn('credentials', { email, password, redirect: false });
+			router.push('/');
+		} else {
+			console.error('Error logging in:', response.data.message);
+			setLoading(false); // Stop loading if there is an error
+		}
+	} catch (error) {
+		console.error('Error during login:', error);
+		setLoading(false); // Stop loading if there is an error
+	}
+};
+
 export const handleSignOut = async (router: any) => {
 	try {
 		await signOut({ redirect: false });
