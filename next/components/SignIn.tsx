@@ -10,6 +10,7 @@ const SignUp = () => {
 	const [mounted, setMounted] = useState(false);
 	const { data: session, status } = useSession();
 	const router = useRouter();
+	const [name, setName] = useState('');
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
 	const [loading, setLoading] = useState(false);
@@ -48,10 +49,12 @@ const SignUp = () => {
 		setLoading(true);
 		try {
 			console.log('Sign up form submitted');
+			console.log('Name:', name);
 			console.log('Email:', email);
 			console.log('Password:', password);
 
 			const response = await axios.post('/api/register', {
+				name,
 				email,
 				password,
 			});
@@ -97,6 +100,13 @@ const SignUp = () => {
 				<div>
 					<button onClick={handleSignIn}>Sign up with Google</button>
 					<form onSubmit={handleEmailSignUp}>
+						<input
+							type='text'
+							value={name}
+							onChange={(e) => setName(e.target.value)}
+							placeholder='Name'
+							required
+						/>
 						<input
 							type='email'
 							value={email}

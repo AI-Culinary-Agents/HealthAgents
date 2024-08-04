@@ -1,4 +1,4 @@
-import { prisma } from './../../../lib/prisma';
+import { prisma } from '../../../lib/prisma';
 import bcrypt from 'bcryptjs';
 import { NextRequest, NextResponse } from 'next/server';
 
@@ -7,13 +7,13 @@ console.log('Register API loaded');
 export async function POST(req: NextRequest) {
 	console.log('Register handler invoked');
 
-	const { email, password } = await req.json();
-	console.log('Received request body:', { email, password });
+	const { name, email, password } = await req.json();
+	console.log('Received request body:', { name, email, password });
 
-	if (!email || !password) {
-		console.log('Missing email or password');
+	if (!name || !email || !password) {
+		console.log('Missing name, email, or password');
 		return NextResponse.json(
-			{ message: 'Email and password are required' },
+			{ message: 'Name, email, and password are required' },
 			{ status: 400 }
 		);
 	}
@@ -26,6 +26,7 @@ export async function POST(req: NextRequest) {
 		console.log('Creating user in database');
 		const user = await prisma.user.create({
 			data: {
+				name,
 				email,
 				password: hashedPassword,
 			},
