@@ -4,11 +4,14 @@ import React, { useEffect, useState } from 'react';
 import { signIn, useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
+import axios from 'axios';
 
 const SignUp = () => {
 	const [mounted, setMounted] = useState(false);
 	const { data: session, status } = useSession();
 	const router = useRouter();
+	const [email, setEmail] = useState('');
+	const [password, setPassword] = useState('');
 
 	useEffect(() => {
 		setMounted(true);
@@ -39,6 +42,32 @@ const SignUp = () => {
 		}
 	};
 
+	const handleEmailSignUp = async (e: { preventDefault: () => void }) => {
+		e.preventDefault();
+		try {
+			console.log('Sign up form submitted');
+			console.log('Email:', email);
+			console.log('Password:', password);
+
+			const response = await axios.post('/api/register', {
+				email,
+				password,
+			});
+
+			console.log('Response data:', response.data);
+
+			if (response.status === 201) {
+				console.log('User registered successfully');
+				await signIn('credentials', { email, password, redirect: false });
+				router.push('/'); // Redirect to home page after sign-up
+			} else {
+				console.error('Error registering user:', response.data.message);
+			}
+		} catch (error) {
+			console.error('Error during email sign-up:', error);
+		}
+	};
+
 	if (status === 'loading') {
 		return <div>Loading...</div>;
 	}
@@ -48,17 +77,38 @@ const SignUp = () => {
 			<h1>Sign Up</h1>
 			{session ? (
 				<div>
-					<Image
-						src={session.user?.image ?? ''}
-						alt='Landscape picture'
-						width={100}
-						height={100}
-					/>
+					{session.user?.image && (
+						<Image
+							src={session.user?.image}
+							alt='Profile Picture'
+							width={100}
+							height={100}
+						/>
+					)}
 					<p>Signed in as {session.user?.email}</p>
 					<button onClick={handleSignOut}>Sign out</button>
 				</div>
 			) : (
-				<button onClick={handleSignIn}>Sign up with Google</button>
+				<div>
+					<button onClick={handleSignIn}>Sign up with Google</button>
+					<form onSubmit={handleEmailSignUp}>
+						<input
+							type='email'
+							value={email}
+							onChange={(e) => setEmail(e.target.value)}
+							placeholder='Email'
+							required
+						/>
+						<input
+							type='password'
+							value={password}
+							onChange={(e) => setPassword(e.target.value)}
+							placeholder='Password'
+							required
+						/>
+						<button type='submit'>Sign up with Email</button>
+					</form>
+				</div>
 			)}
 		</div>
 	);

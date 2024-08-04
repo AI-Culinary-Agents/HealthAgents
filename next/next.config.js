@@ -4,7 +4,13 @@ const nextConfig = {
 	// output: 'export',
 	distDir: './dist',
 	images: {
-		domains: ['lh3.googleusercontent.com'],
+		remotePatterns: [
+			{
+				protocol: 'https',
+				hostname: 'lh3.googleusercontent.com',
+				pathname: '/**',
+			},
+		],
 	},
 };
 
