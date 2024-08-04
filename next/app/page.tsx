@@ -5,7 +5,7 @@ import Sidebar from '../components/Sidebar';
 import ChatWindow from '../components/ChatWindow';
 import LoadingScreen from '../components/LoadingScreen';
 import SignUpPage from './signup/page';
-import { initializeEventSource } from '../Utility/utils';
+import { initializeEventSource } from '../utils/utils';
 
 const HomePage = () => {
 	const [isWaiting, setIsWaiting] = useState(false);

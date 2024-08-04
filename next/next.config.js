@@ -1,7 +1,14 @@
+import path from 'path';
+import { fileURLToPath } from 'url';
+
 /** @type {import('next').NextConfig} */
+
+// Get the __dirname equivalent in ES modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
 const nextConfig = {
 	reactStrictMode: true,
-	// output: 'export',
 	distDir: './dist',
 	images: {
 		remotePatterns: [
@@ -11,6 +18,10 @@ const nextConfig = {
 				pathname: '/**',
 			},
 		],
+	},
+	webpack: (config) => {
+		config.resolve.alias['@'] = path.resolve(__dirname, '.');
+		return config;
 	},
 };
 

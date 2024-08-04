@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ChatMessage from './ChatMessage';
-import sendMessageToServer from '../Utility/utils';
+import sendMessageToServer from '../utils/utils';
 import Message from '../TS/types';
 
 const ChatWindow: React.FC<{

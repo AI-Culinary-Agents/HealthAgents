@@ -1,5 +1,4 @@
-import { NextResponse } from 'next/server';
-import type { NextRequest } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
 const protectedRoutes = ['/', '/profile', '/dashboard'];
@@ -14,7 +13,7 @@ export async function middleware(req: NextRequest) {
 	if (
 		req.nextUrl.pathname.startsWith('/_next') ||
 		req.nextUrl.pathname.startsWith('/api/auth') ||
-		req.nextUrl.pathname.startsWith('/api/register') || // Exclude register route
+		req.nextUrl.pathname.startsWith('/api/register') ||
 		req.nextUrl.pathname === '/signup'
 	) {
 		console.log('Excluded route, continuing request');
