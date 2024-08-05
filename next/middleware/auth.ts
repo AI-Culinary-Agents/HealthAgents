@@ -42,12 +42,12 @@ export async function middleware(req: NextRequest) {
 		}
 
 		// Optionally, check if the token contains the required user ID
-		if (!token.id) {
-			console.log('Token does not contain user ID, redirecting to /signup');
-			const url = new URL('/signup', req.url);
-			console.log('--- Middleware End ---');
-			return NextResponse.redirect(url);
-		}
+		// if (!token.id) {
+		//     console.log('Token does not contain user ID, redirecting to /signup');
+		//     const url = new URL('/signup', req.url);
+		//     console.log('--- Middleware End ---');
+		//     return NextResponse.redirect(url);
+		// }
 	}
 
 	// If the user is authenticated or the route is not protected, allow the request to continue

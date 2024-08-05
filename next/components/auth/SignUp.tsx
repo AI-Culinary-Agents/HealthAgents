@@ -7,7 +7,7 @@ import GoogleSignIn from '@/components/auth/GoogleSignIn';
 import EmailSignUp from '@/components/auth/EmailSignUp';
 import SignOut from '@/components/auth/SignOut';
 import Login from '@/components/auth/Login';
-
+import Loader from './Load';
 const SignUp = () => {
 	const { data: session, status } = useSession();
 	const [activeForm, setActiveForm] = useState('signup');
@@ -19,7 +19,7 @@ const SignUp = () => {
 	if (status === 'loading') {
 		return (
 			<div className='flex items-center justify-center h-screen'>
-				Loading...
+				<Loader />
 			</div>
 		);
 	}

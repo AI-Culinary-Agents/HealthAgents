@@ -39,6 +39,7 @@ export const handleEmailSignUp = async (
 		if (response.status === 201) {
 			console.log('User registered successfully');
 			await signIn('credentials', { email, password, redirect: false });
+
 			router.push('/');
 		} else {
 			console.error('Error registering user:', response.data.message);

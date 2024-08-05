@@ -9,6 +9,7 @@ const SignOut = () => {
 
 	const handleSignOutClick = async () => {
 		await handleSignOut(router);
+		window.location.reload();
 	};
 
 	return (

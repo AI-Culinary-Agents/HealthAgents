@@ -4,9 +4,8 @@ import { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
 import ChatWindow from '../components/ChatWindow';
 import LoadingScreen from '../components/LoadingScreen';
-import SignUpPage from './signup/page';
 import { initializeEventSource } from '../utils/utils';
-
+import SettingsButton from '../components/Settings';
 const HomePage = () => {
 	const [isWaiting, setIsWaiting] = useState(false);
 	const [status, setStatus] = useState<string | null>(null);
@@ -50,7 +49,7 @@ const HomePage = () => {
 				</div>
 				{isWaiting && <LoadingScreen status={status} />}
 			</main>
-			{/* <SignUpPage /> */}
+			<SettingsButton />
 		</Layout>
 	);
 };
