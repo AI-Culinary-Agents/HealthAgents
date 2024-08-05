@@ -4,20 +4,15 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { handleLogin } from '@/utils/authHelpers';
 
-const Login = () => {
+const Login = ({ setLoading }: { setLoading: (loading: boolean) => void }) => {
 	const [email, setEmail] = useState('');
 	const [password, setPassword] = useState('');
-	const [loading, setLoading] = useState(false);
 	const router = useRouter();
 
 	const handleSubmit = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
 		await handleLogin(email, password, router, setLoading);
 	};
-
-	if (loading) {
-		return <div>Loading...</div>;
-	}
 
 	return (
 		<form
@@ -29,7 +24,7 @@ const Login = () => {
 				onChange={(e) => setEmail(e.target.value)}
 				placeholder='Email'
 				required
-				className='p-3 border rounded-md border- focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500'
+				className='p-3 border border-gray-300 rounded-md focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500'
 			/>
 			<input
 				type='password'
@@ -37,7 +32,7 @@ const Login = () => {
 				onChange={(e) => setPassword(e.target.value)}
 				placeholder='Password'
 				required
-				className='p-3 border rounded-md border- focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500'
+				className='p-3 border border-gray-300 rounded-md focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500'
 			/>
 			<button
 				type='submit'

@@ -8,15 +8,25 @@ import EmailSignUp from '@/components/auth/EmailSignUp';
 import SignOut from '@/components/auth/SignOut';
 import Login from '@/components/auth/Login';
 import Loader from './Load';
+import { useRouter } from 'next/navigation';
+
 const SignUp = () => {
 	const { data: session, status } = useSession();
 	const [activeForm, setActiveForm] = useState('signup');
+	const [loading, setLoading] = useState(false);
+	const router = useRouter();
+
+	useEffect(() => {
+		if (status === 'authenticated') {
+			router.push('/');
+		}
+	}, [status, router]);
 
 	const handleToggle = (formName: string) => {
 		setActiveForm((prevForm) => (prevForm === formName ? '' : formName));
 	};
 
-	if (status === 'loading') {
+	if (status === 'loading' || loading) {
 		return (
 			<div className='flex items-center justify-center h-screen'>
 				<Loader />
@@ -63,8 +73,8 @@ const SignUp = () => {
 								Log in with Email
 							</button>
 						</div>
-						{activeForm === 'signup' && <EmailSignUp />}
-						{activeForm === 'login' && <Login />}
+						{activeForm === 'signup' && <EmailSignUp setLoading={setLoading} />}
+						{activeForm === 'login' && <Login setLoading={setLoading} />}
 					</div>
 				)}
 			</div>

@@ -23,31 +23,22 @@ export const handleEmailSignUp = async (
 ) => {
 	setLoading(true);
 	try {
-		console.log('Sign up form submitted');
-		console.log('Name:', name);
-		console.log('Email:', email);
-		console.log('Password:', password);
-
 		const response = await axios.post('/api/register', {
 			name,
 			email,
 			password,
 		});
 
-		console.log('Response data:', response.data);
-
 		if (response.status === 201) {
-			console.log('User registered successfully');
 			await signIn('credentials', { email, password, redirect: false });
-
 			router.push('/');
 		} else {
 			console.error('Error registering user:', response.data.message);
-			setLoading(false); // Stop loading if there is an error
 		}
 	} catch (error) {
 		console.error('Error during email sign-up:', error);
-		setLoading(false); // Stop loading if there is an error
+	} finally {
+		setLoading(false);
 	}
 };
 
@@ -59,28 +50,18 @@ export const handleLogin = async (
 ) => {
 	setLoading(true);
 	try {
-		console.log('Login form submitted');
-		console.log('Email:', email);
-		console.log('Password:', password);
-
-		const response = await axios.post('/api/login', {
-			email,
-			password,
-		});
-
-		console.log('Response data:', response.data);
+		const response = await axios.post('/api/login', { email, password });
 
 		if (response.status === 200) {
-			console.log('User logged in successfully');
 			await signIn('credentials', { email, password, redirect: false });
 			router.push('/');
 		} else {
 			console.error('Error logging in:', response.data.message);
-			setLoading(false); // Stop loading if there is an error
 		}
 	} catch (error) {
 		console.error('Error during login:', error);
-		setLoading(false); // Stop loading if there is an error
+	} finally {
+		setLoading(false);
 	}
 };
 
