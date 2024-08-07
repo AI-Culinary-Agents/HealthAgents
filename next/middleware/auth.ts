@@ -37,6 +37,7 @@ export async function middleware(req: NextRequest) {
 		if (!token) {
 			console.log('No token found, redirecting to /signup');
 			const url = new URL('/signup', req.url);
+			console.log('🚀 ~ middleware ~ url:', url);
 			console.log('--- Middleware End ---');
 			return NextResponse.redirect(url);
 		}

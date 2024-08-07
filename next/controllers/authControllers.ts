@@ -61,7 +61,6 @@ export const loginUser = async (req: Request) => {
 			{ status: 401 }
 		);
 	}
-
 	// Optionally, you might want to create a session or token here
 
 	return NextResponse.json(user, { status: 200 });
