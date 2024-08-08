@@ -18,7 +18,7 @@ const SignUp = () => {
 
 	useEffect(() => {
 		if (status === 'authenticated') {
-			router.push('/');
+			router.push('/thread/1d3b52b9-329c-4510-89d5-6b1bd9067387');
 		}
 	}, [status, router]);
 

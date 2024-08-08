@@ -1,7 +1,8 @@
 import React from 'react';
 import { GrUserSettings } from 'react-icons/gr';
 import Link from 'next/link';
-const SettingsButton = () => {
+const SettingsButton = ({ currentThread }: { currentThread: any }) => {
+	currentThread = currentThread;
 	return (
 		<div>
 			<Link href='/profile'>

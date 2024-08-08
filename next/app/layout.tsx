@@ -1,27 +1,23 @@
+// app/layout.tsx (if using Next.js 13)
 'use client';
 import { SessionProvider } from 'next-auth/react';
-import React from 'react';
-import '../styles/global.css';
+import { ThreadsProvider } from '@/context/threadContext';
+import '../styles/global.css'; // Adjust the path as needed
 
-const RootLayout = ({ children }: { children: React.ReactNode }) => {
+import { ReactNode } from 'react';
+
+const RootLayout = ({
+	children,
+	session,
+}: {
+	children: ReactNode;
+	session: any;
+}) => {
 	return (
-		<html lang='en'>
-			<head>
-				<meta charSet='UTF-8' />
-				<link
-					rel='icon'
-					type='image/svg+xml'
-					href='/vite.svg'
-				/>
-				<meta
-					name='viewport'
-					content='width=device-width, initial-scale=1.0'
-				/>
-				<title>Vite + React + TS</title>
-			</head>
-			<body className='relative flex h-screen bg-gray-100'>
-				<SessionProvider>
-					<main className='flex flex-col flex-1 p-4'>{children}</main>
+		<html>
+			<body>
+				<SessionProvider session={session}>
+					<ThreadsProvider>{children}</ThreadsProvider>
 				</SessionProvider>
 			</body>
 		</html>

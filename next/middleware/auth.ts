@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getToken } from 'next-auth/jwt';
 
-const protectedRoutes = ['/', '/profile', '/dashboard'];
+const protectedRoutes = ['/profile', '/dashboard'];
 
 export async function middleware(req: NextRequest) {
 	console.log('--- Middleware Start ---');
@@ -15,6 +15,7 @@ export async function middleware(req: NextRequest) {
 		req.nextUrl.pathname.startsWith('/api/auth') ||
 		req.nextUrl.pathname.startsWith('/api/register') ||
 		req.nextUrl.pathname.startsWith('/api/login') ||
+		req.nextUrl.pathname.startsWith('/api/thread') ||
 		req.nextUrl.pathname === '/signup'
 	) {
 		console.log('Excluded route, continuing request');
@@ -36,7 +37,7 @@ export async function middleware(req: NextRequest) {
 		// If the user is not authenticated, redirect to the sign-up page
 		if (!token) {
 			console.log('No token found, redirecting to /signup');
-			const url = new URL('/signup', req.url);
+			const url = new URL('/', req.url);
 			console.log('🚀 ~ middleware ~ url:', url);
 			console.log('--- Middleware End ---');
 			return NextResponse.redirect(url);
@@ -58,5 +59,5 @@ export async function middleware(req: NextRequest) {
 }
 
 export const config = {
-	matcher: ['/', '/profile/:path*', '/dashboard/:path*'],
+	matcher: ['/profile/:path*', '/dashboard/:path*', '/thread/:path*'],
 };

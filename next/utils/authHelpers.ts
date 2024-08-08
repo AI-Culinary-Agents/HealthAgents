@@ -31,7 +31,7 @@ export const handleEmailSignUp = async (
 
 		if (response.status === 201) {
 			await signIn('credentials', { email, password, redirect: false });
-			router.push('/');
+			router.push('/thread');
 		} else {
 			console.error('Error registering user:', response.data.message);
 		}
@@ -54,7 +54,7 @@ export const handleLogin = async (
 
 		if (response.status === 200) {
 			await signIn('credentials', { email, password, redirect: false });
-			router.push('/');
+			router.push('/thread');
 		} else {
 			console.error('Error logging in:', response.data.message);
 		}
@@ -68,7 +68,7 @@ export const handleLogin = async (
 export const handleSignOut = async (router: any) => {
 	try {
 		await signOut({ redirect: false });
-		router.push('/signup');
+		router.push('/');
 	} catch (error) {
 		console.error('Error during sign-out:', error);
 	}

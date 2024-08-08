@@ -3,6 +3,7 @@ import { NextAuthOptions } from 'next-auth';
 import NextAuth from 'next-auth/next';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { upsertUser, findUserByEmail } from '@/models/userModel';
 import bcrypt from 'bcryptjs';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
@@ -34,9 +35,7 @@ const authOption: NextAuthOptions = {
 				if (!credentials?.email || !credentials.password) {
 					throw new Error('Email and password are required');
 				}
-				const user = await prisma.user.findUnique({
-					where: { email: credentials.email },
-				});
+				const user = await findUserByEmail(credentials.email);
 				if (!user || !user.password) {
 					throw new Error('No user found or password not set');
 				}
@@ -57,28 +56,28 @@ const authOption: NextAuthOptions = {
 				if (!profile?.email) {
 					throw new Error('No profile');
 				}
-				await prisma.user.upsert({
-					where: { email: profile.email },
-					create: {
-						email: profile.email,
-						name: profile.name,
-					},
-					update: {
-						name: profile.name,
-					},
+
+				const existingUser = await findUserByEmail(profile.email);
+				const userId = existingUser?.id ?? '';
+
+				await upsertUser({
+					id: userId,
+					email: profile.email,
+					name: profile.name || '',
+					password: 'google',
 				});
 			}
 			return true;
 		},
 		async session({ session, token }) {
 			if (token && session.user) {
-				(session.user as { id: string }).id = token.id as string;
+				session.user.id = token.id;
 			}
 			return session;
 		},
 		async jwt({ token, user }) {
 			if (user) {
-				token.id = user.id;
+				token.id = user.id; // Store the database user ID in the token
 			}
 			return token;
 		},

@@ -4,8 +4,8 @@ from langgraph.graph import StateGraph, END
 from graph import AgentState, send_data_to_server, retrieve_final_data  # avoid circular import
 from .postgres_saver import PostgresSaver
 
-def process_user_input(user_input):
-    print("Starting process_user_input with:", user_input)  
+def process_user_input(user_data):
+    print("Starting process_user_input with:", user_data)
     planner = get_plan_node()
     researcher = get_research_plan_node()
     grader = get_grader_node()
@@ -52,7 +52,7 @@ def process_user_input(user_input):
     thread = {"configurable": {"thread_id": "1"}}
 
     state = AgentState(
-        task=user_input,
+        task=user_data['text'],
         plan="",
         generated="", 
         content=[],
@@ -63,12 +63,12 @@ def process_user_input(user_input):
         search_number=0,
         max_searches=1, # Adjust (2-3 recommended)
         max_revisions=1, # Adjust (2-3 recommended)
-        use_saved_data=False 
+        use_saved_data=True 
     )
 
     for event in graph.stream(state, thread):
         print('------------------')
-        print(event)
+        # print(event)
         print('------------------')
 
     results = retrieve_final_data()

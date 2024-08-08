@@ -6,25 +6,30 @@ import Message from '../TS/types';
 const ChatWindow: React.FC<{
 	setIsWaiting: (waiting: boolean) => void;
 	setStatus: (status: string | null) => void;
-}> = ({ setIsWaiting, setStatus }) => {
+	currentThread: number;
+	userId: string;
+}> = ({ setIsWaiting, setStatus, currentThread, userId }) => {
 	const [messages, setMessages] = useState<Message[]>([]);
 	const [input, setInput] = useState('');
 	const [localIsWaiting, setLocalIsWaiting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
 
+	console.log(userId);
 	const handleSend = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (input.trim().length < 8) {
-			setError('Message must be at least 8 characters long.');
-			return;
-		}
+		// if (input.trim().length < 8) {
+		// 	setError('Message must be at least 8 characters long.');
+		// 	return;
+		// }
 
 		setError(null); // Clear previous error
 		const newMessageId = Date.now();
 		const userMessage: Message = {
-			id: newMessageId,
+			messageId: newMessageId,
 			text: input,
 			sender: 'user',
+			userId: userId,
+			threadid: currentThread,
 		};
 		setMessages((prevMessages) => [...prevMessages, userMessage]);
 		setInput('');
@@ -34,15 +39,17 @@ const ChatWindow: React.FC<{
 
 		try {
 			const { generated, grading_score, hellucination_score } =
-				await sendMessageToServer(input);
+				await sendMessageToServer(userMessage);
 			const botMessageId = newMessageId + 1;
 
 			const botMessage: Message = {
-				id: botMessageId,
+				messageId: botMessageId,
 				text: `${generated}\n\nGrading Score: ${grading_score}%\nHellucination Score: ${Math.round(
 					hellucination_score
 				)}%`,
 				sender: 'bot',
+				threadid: currentThread,
+				userId: userId,
 			};
 			setMessages((prevMessages) => [...prevMessages, botMessage]);
 		} catch (error) {
@@ -63,7 +70,7 @@ const ChatWindow: React.FC<{
 			<div className='flex-grow overflow-auto p-6 max-h=[55vh] overflow-y-auto'>
 				{messages.map((message) => (
 					<ChatMessage
-						key={message.id}
+						key={message.messageId}
 						message={message}
 					/>
 				))}

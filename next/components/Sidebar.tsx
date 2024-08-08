@@ -1,21 +1,35 @@
+'use client';
+
 import { useState } from 'react';
-import { v4 as uuidv4 } from 'uuid';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
+import { useThreads } from '@/context/threadContext';
+import axios from 'axios';
 
 const Sidebar = () => {
-	// storing threads in state
-	const [threads, setThreads] = useState([
-		{ id: uuidv4(), name: 'Thread 1' },
-		{ id: uuidv4(), name: 'Thread 2' },
-	]);
-	//  storing new thread name in state
+	const router = useRouter();
+	const { data: session } = useSession();
+	const { threads, setThreads } = useThreads();
 	const [newThreadName, setNewThreadName] = useState('');
 
-	// spreads prev threads and adds new thread
-	const handleAddThread = () => {
-		if (newThreadName.trim() !== '') {
-			setThreads([...threads, { id: uuidv4(), name: newThreadName }]);
-			setNewThreadName('');
+	const handleAddThread = async () => {
+		if (newThreadName.trim() !== '' && session?.user?.id) {
+			try {
+				const response = await axios.post('/api/threads', {
+					name: newThreadName,
+					created_by: session.user.id, // Use session user id directly
+				});
+				const newThreadId = response.data.threadId;
+				setThreads((prevThreads: any) => [
+					...prevThreads,
+					{ id: newThreadId, name: newThreadName },
+				]);
+				setNewThreadName('');
+				router.push(`/thread/${newThreadId}`);
+			} catch (error) {
+				console.error('Error creating new thread:', error);
+			}
 		}
 	};
 
@@ -23,13 +37,12 @@ const Sidebar = () => {
 		<aside className='flex flex-col w-64 p-4 text-white bg-gray-800'>
 			<h2 className='mb-4 text-2xl font-bold'>Threads</h2>
 			<ul>
-				{threads.map((thread) => (
+				{threads.map((thread: { id: string; name: string }) => (
 					<ol
 						key={thread.id}
 						className='mb-2'>
-						{/* Links for each thread that route dynamically by threadID to app/thread/[id] */}
 						<Link href={`/thread/${thread.id}`}>
-							<li className='hover:underline'>{thread.name}</li>
+							<li className='cursor-pointer hover:underline'>{thread.name}</li>
 						</Link>
 					</ol>
 				))}

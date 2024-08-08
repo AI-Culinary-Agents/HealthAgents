@@ -20,13 +20,15 @@ def is_valid_input(text):
 @app.route('/api/data', methods=['POST'])
 def process_data():
     data = request.json
-    input_text = data.get('text', '')
+    print("Received data:", data)
+    input_text = data['text']['text']
     print("Received input:", input_text)  
     if not is_valid_input(input_text):
+        print('not validddddddd')
         return jsonify({"error": "Invalid input, must be more than 8 characters"}), 400
     
     try:
-        processed_result = process_user_input(input_text)
+        processed_result = process_user_input(data['text'])
         print("Processed result:", processed_result) 
 
         return jsonify(processed_result)

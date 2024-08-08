@@ -29,7 +29,8 @@
 		"**/*.ts",
 		"**/*.tsx",
 		".next/types/**/*.ts",
-		"./dist/types/**/*.ts"
+		"./dist/types/**/*.ts",
+		"context/threadContext.js"
 	],
 	"exclude": ["node_modules"]
 }
