@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import ChatMessage from './ChatMessage';
 import sendMessageToServer from '../utils/utils';
 import Message from '../TS/types';
@@ -14,6 +14,9 @@ const ChatWindow: React.FC<{
 	const [input, setInput] = useState('');
 	const [localIsWaiting, setLocalIsWaiting] = useState(false);
 	const [error, setError] = useState<string | null>(null);
+	const [showScrollDown, setShowScrollDown] = useState(false); // State for showing the scroll-down popup
+	const messagesEndRef = useRef<HTMLDivElement | null>(null); // Reference to the end of the messages container
+	const chatWindowRef = useRef<HTMLDivElement | null>(null); // Reference to the chat window container
 
 	// Fetch messages from the database when the component mounts
 	useEffect(() => {
@@ -35,9 +38,9 @@ const ChatWindow: React.FC<{
 								parsedMessage.generated
 							}\n\nGrading Score: ${
 								parsedMessage.grading_score
-							}%\nHellucination Score: ${Math.round(
+							}% (Relevance of the data used relative to input)\nHellucination Score: ${Math.round(
 								parsedMessage.hellucination_score
-							)}%`;
+							)}% (Likelihood of information made up by the model)`;
 						} catch (e) {
 							console.warn('Failed to parse bot message JSON', e);
 						}
@@ -59,6 +62,30 @@ const ChatWindow: React.FC<{
 
 		fetchMessages();
 	}, [currentThread]);
+
+	// Scroll to the bottom of the messages container when messages change
+	useEffect(() => {
+		if (messagesEndRef.current) {
+			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+		}
+	}, [messages]);
+
+	// Track the scroll position and show/hide the scroll-down popup
+	const handleScroll = () => {
+		if (chatWindowRef.current) {
+			const { scrollTop, scrollHeight, clientHeight } = chatWindowRef.current;
+			const scrollPosition = scrollTop + clientHeight;
+			const isAboveThreshold =
+				scrollHeight - scrollPosition > scrollHeight * 0.1; // 10% above the bottom
+
+			console.log('Scroll position:', scrollPosition);
+			console.log('Client height:', clientHeight);
+			console.log('Scroll height:', scrollHeight);
+			console.log('Is above threshold:', isAboveThreshold);
+
+			setShowScrollDown(isAboveThreshold);
+		}
+	};
 
 	const handleSend = async (e: React.FormEvent) => {
 		e.preventDefault();
@@ -93,9 +120,9 @@ const ChatWindow: React.FC<{
 
 				const botMessage: Message = {
 					messageId: botMessageId,
-					text: `${generated}\n\nGrading Score: ${grading_score}%\nHellucination Score: ${Math.round(
+					text: `${generated}\n\nGrading Score: ${grading_score}% (Relevance of the data used relative to input)\nHellucination Score: ${Math.round(
 						hellucination_score
-					)}%`,
+					)}% (Likelihood of information made up by the model)`,
 					sender: 'bot',
 					threadid: currentThread,
 					userId: userId,
@@ -120,16 +147,36 @@ const ChatWindow: React.FC<{
 		setInput(e.target.value);
 	};
 
+	// Function to scroll to the bottom when the user clicks the popup
+	const scrollToBottom = () => {
+		if (messagesEndRef.current) {
+			messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+		}
+		setShowScrollDown(false); // Hide the popup after scrolling
+	};
+
 	return (
 		<div className='flex flex-col w-[70%] max-w-6xl mx-auto relative h-[70vh]'>
-			<div className='flex-grow overflow-auto p-6 max-h=[55vh] overflow-y-auto'>
+			<div
+				ref={chatWindowRef} // Reference to the chat window for tracking scroll
+				onScroll={handleScroll} // Handle scroll events
+				className='flex-grow overflow-auto p-6 max-h-[55vh] overflow-y-auto mb-1.5'>
 				{messages.map((message) => (
 					<ChatMessage
 						key={message.messageId}
 						message={message}
 					/>
 				))}
+				<div ref={messagesEndRef} /> {/* Reference point for auto-scroll */}
 			</div>
+			{/* Scroll Down Popup */}
+			{showScrollDown && (
+				<button
+					onClick={scrollToBottom}
+					className='w-[16rem] px-4 py-2 text-white bg-yellow-500 rounded-lg shadow-lg mx-auto'>
+					Scroll Down
+				</button>
+			)}
 			<form
 				onSubmit={handleSend}
 				className='flex items-center mt-auto space-x-2'>
