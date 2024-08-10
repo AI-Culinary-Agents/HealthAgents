@@ -12,7 +12,7 @@ const Sidebar = () => {
 	const { data: session } = useSession();
 	const { threads, setThreads } = useThreads();
 	const [newThreadName, setNewThreadName] = useState('');
-
+	console.log(session);
 	const handleAddThread = async () => {
 		if (newThreadName.trim() !== '' && session?.user?.id) {
 			try {

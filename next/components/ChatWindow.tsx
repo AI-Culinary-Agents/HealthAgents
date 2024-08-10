@@ -38,8 +38,11 @@ const ChatWindow: React.FC<{
 		setStatus('Processing...');
 
 		try {
-			const { generated, grading_score, hellucination_score } =
-				await sendMessageToServer(userMessage);
+			const data = await sendMessageToServer(userMessage);
+			console.log('🚀 ~ handleSend ~ data:', data);
+
+			const { generated, grading_score, hellucination_score } = data;
+
 			const botMessageId = newMessageId + 1;
 
 			const botMessage: Message = {

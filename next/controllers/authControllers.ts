@@ -1,29 +1,45 @@
 import bcrypt from 'bcryptjs';
-import { upsertUser, findUserByEmail } from '../models/userModel';
-import { NextResponse } from 'next/server';
+import { findUserByEmail } from '@/models/userModel';
+import { NextResponse, NextRequest } from 'next/server';
 
-export const registerUser = async (req: Request) => {
-	const { name, email, password } = await req.json();
+export const loginUser = async (req: NextRequest) => {
+	const { email, password } = await req.json();
 
-	if (!name || !email || !password) {
+	if (!email || !password) {
 		return NextResponse.json(
-			{ message: 'Name, email, and password are required' },
+			{ message: 'Email and password are required' },
 			{ status: 400 }
 		);
 	}
 
-	const hashedPassword = await bcrypt.hash(password, 10);
-
 	try {
-		const user = await upsertUser({
-			name,
-			email,
-			password: hashedPassword,
-		});
-		return NextResponse.json(user, { status: 201 });
+		const user = await findUserByEmail(email);
+
+		if (!user || !user.password) {
+			return NextResponse.json(
+				{ message: 'Invalid email or password' },
+				{ status: 401 }
+			);
+		}
+
+		const isValidPassword = await bcrypt.compare(password, user.password);
+
+		if (!isValidPassword) {
+			return NextResponse.json(
+				{ message: 'Invalid email or password' },
+				{ status: 401 }
+			);
+		}
+
+		// If you need to create a session or JWT, you can do that here
+		// For example:
+		// const token = createJWT(user);
+		// return NextResponse.json({ token });
+
+		return NextResponse.json(user, { status: 200 });
 	} catch (error: any) {
 		return NextResponse.json(
-			{ message: 'Error creating or updating user', error },
+			{ message: 'Error logging in user', error },
 			{ status: 500 }
 		);
 	}

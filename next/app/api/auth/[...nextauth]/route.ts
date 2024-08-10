@@ -3,7 +3,6 @@ import { NextAuthOptions } from 'next-auth';
 import NextAuth from 'next-auth/next';
 import GoogleProvider from 'next-auth/providers/google';
 import CredentialsProvider from 'next-auth/providers/credentials';
-import { upsertUser, findUserByEmail } from '@/models/userModel';
 import bcrypt from 'bcryptjs';
 
 const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID!;
@@ -35,7 +34,9 @@ const authOption: NextAuthOptions = {
 				if (!credentials?.email || !credentials.password) {
 					throw new Error('Email and password are required');
 				}
-				const user = await findUserByEmail(credentials.email);
+				const user = await prisma.user.findUnique({
+					where: { email: credentials.email },
+				});
 				if (!user || !user.password) {
 					throw new Error('No user found or password not set');
 				}
@@ -57,27 +58,37 @@ const authOption: NextAuthOptions = {
 					throw new Error('No profile');
 				}
 
-				const existingUser = await findUserByEmail(profile.email);
-				const userId = existingUser?.id ?? '';
-
-				await upsertUser({
-					id: userId,
-					email: profile.email,
-					name: profile.name || '',
-					password: 'google',
+				let user = await prisma.user.findUnique({
+					where: { email: profile.email },
 				});
+
+				if (!user) {
+					user = await prisma.user.create({
+						data: {
+							email: profile.email,
+							name: profile.name || '',
+							password: 'google', // Or any placeholder since Google users won't have a password
+						},
+					});
+				}
+
+				// Attach the database user ID to the account
+				account.id = user.id;
 			}
 			return true;
 		},
 		async session({ session, token }) {
 			if (token && session.user) {
-				session.user.id = token.id;
+				session.user.id = token.id; // Use the database user ID
 			}
 			return session;
 		},
-		async jwt({ token, user }) {
+		async jwt({ token, user, account }) {
 			if (user) {
 				token.id = user.id; // Store the database user ID in the token
+			}
+			if (account && account.id) {
+				token.id = account.id; // Ensure to store the ID from account during Google sign-in
 			}
 			return token;
 		},

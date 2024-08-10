@@ -5,6 +5,7 @@ from graph import AgentState, send_data_to_server, retrieve_final_data  # avoid 
 from .postgres_saver import PostgresSaver
 
 def process_user_input(user_data):
+    
     print("Starting process_user_input with:", user_data)
     planner = get_plan_node()
     researcher = get_research_plan_node()
@@ -50,7 +51,6 @@ def process_user_input(user_data):
     graph = workflow.compile(checkpointer=postgres_checkpointer)
 
     thread = {"configurable": {"thread_id": "1"}}
-
     state = AgentState(
         task=user_data['text'],
         plan="",

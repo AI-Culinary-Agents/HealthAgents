@@ -9,7 +9,7 @@ def send_data_to_server(data):
     else:
         print("ERROR SENDING STATUS:", response.status_code, response.text)
 
-def update_server_with_status(phase, message, delay=5):
+def update_server_with_status(phase, message, delay=1):
     data = {
         "phase": phase,
         "status": message

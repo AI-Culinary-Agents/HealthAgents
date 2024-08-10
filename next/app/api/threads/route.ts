@@ -10,8 +10,9 @@ export async function POST(req: NextRequest) {
 }
 
 export async function GET(req: NextRequest) {
-	const created_by = req.nextUrl.searchParams.get('created_by');
-	console.log(req.nextUrl);
+	const url = new URL(req.url);
+	const created_by = url.searchParams.get('userId');
+	console.log(url);
 	console.log('userId:', created_by);
 
 	if (created_by) {
