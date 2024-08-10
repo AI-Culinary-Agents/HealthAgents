@@ -9,7 +9,7 @@ def send_data_to_server(data):
     else:
         print("ERROR SENDING STATUS:", response.status_code, response.text)
 
-def update_server_with_status(phase, message, delay=1):
+def update_server_with_status(phase, message, delay=5):
     data = {
         "phase": phase,
         "status": message
@@ -31,6 +31,8 @@ def update_server_during_generator():
 
 def update_server_during_reviewer():
     update_server_with_status("reviewer", "Reviewer agent is reviewing the content.", delay=2)  # 2 seconds delay
+    
+
 
 # Example usage
 if __name__ == "__main__":
