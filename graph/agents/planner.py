@@ -1,3 +1,4 @@
+
 import json
 import os
 from dotenv import load_dotenv
@@ -6,33 +7,47 @@ from langchain_core.messages import SystemMessage, HumanMessage
 load_dotenv()
 
 from .prompts import PLAN_PROMPT
+
 def plan_node(state, use_saved_data: bool = False):
-    from graph import model # avoid circular import
+    from graph import model, add_history  # avoid circular import
     from graph.status_updates import update_server_during_planner
+    
     directory = os.environ.get("PLANNER_DATA_DIR", "../tests/plan_save")
     filename = os.path.join(directory, "plan_data.json")
     update_server_during_planner()
+
     if not os.path.exists(directory):
         os.makedirs(directory)
     
-    # use saved data if available
+    # Use saved data if available
     if use_saved_data and os.path.exists(filename):
         print("From saved data!")
         with open(filename, 'r') as file:
             saved_data = json.load(file)
-            return {"plan": saved_data["plan"]}
+            add_history(state, "planner", saved_data["plan"])
+            return {"plan": saved_data["plan"], "history": state["history"]}
     
+    # Generate plan based on the task
     messages = [
         SystemMessage(content=PLAN_PROMPT), 
         HumanMessage(content=state['task'])
     ]
     response = model.invoke(messages)
     
-    # Saving
+    # Save the plan
     with open(filename, 'w') as file:
         json.dump({"plan": response.content}, file)
 
-    return {"plan": response.content}
+    # Update history with the plan
+    add_history(state, "planner", response.content)
+
+    print("-----PLANNER------")
+    return {"plan": response.content, "history": state["history"]}
+
+# Test
+if __name__ == "__main__":
+    from graph import AgentState  # avoid circular import
+
 
 # from dotenv import load_dotenv
 # from langchain_core.messages import SystemMessage, HumanMessage

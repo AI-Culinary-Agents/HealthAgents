@@ -31,6 +31,8 @@ def update_server_during_generator():
 
 def update_server_during_reviewer():
     update_server_with_status("reviewer", "Reviewer agent is reviewing the content.", delay=2)  # 2 seconds delay
+    
+
 
 # Example usage
 if __name__ == "__main__":

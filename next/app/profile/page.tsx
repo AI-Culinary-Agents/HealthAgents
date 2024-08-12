@@ -1,12 +1,12 @@
-import React from "react"
-import { getUserSession } from "@/lib/session"
+import { getUserSession } from '@/lib/session';
+import ClientProfile from '@/components/clientProfile';
 
 export default async function ProfilePage() {
-  const user = await getUserSession()
-  return (
-    <main>
-      <h1>Profile</h1>
-      <pre>{JSON.stringify(user, null, 2)}</pre>
-    </main>
-  )
+	const user = await getUserSession();
+	console.log(user);
+	return (
+		<ClientProfile
+			user={{ ...user, name: user.name ?? '', email: user.email ?? '' }}
+		/>
+	);
 }

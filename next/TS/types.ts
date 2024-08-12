@@ -1,6 +1,8 @@
 type Message = {
-  id: number
-  text: string
-  sender: "user" | "bot"
-}
-export default Message
+	messageId: number;
+	text: string;
+	threadid: number;
+	sender: 'user' | 'bot';
+	userId: string;
+};
+export default Message;
