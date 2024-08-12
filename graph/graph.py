@@ -1,12 +1,49 @@
 from psycopg_pool import ConnectionPool
-from graph.agents import get_plan_node, get_research_plan_node, get_grader_node, get_generator_node, get_reviewer_node
+from graph.agents import get_plan_node, get_research_plan_node, get_grader_node, get_generator_node, get_reviewer_node, get_interpreter_node
 from langgraph.graph import StateGraph, END
 from graph import AgentState, send_data_to_server, retrieve_final_data  # avoid circular import
 from .postgres_saver import PostgresSaver
 
-def process_user_input(user_data):
+def process_user_input(data):
+    print("Starting process_user_input with:", data)  
+    text = data['text']
+    thread_id = str(data['threadid'])
     
-    print("Starting process_user_input with:", user_data)
+    state = AgentState(
+        task=text,
+        plan="",
+        generated="", 
+        content=[],
+        grading_score=0, 
+        revision_number=0, 
+        final_review="",
+        hellucination_score=0,  
+        search_number=0,
+        max_searches=1, # Adjust (2-3 recommended)
+        max_revisions=1, # Adjust (2-3 recommended)
+        use_saved_data=False,
+        history=[],
+        thread_id=thread_id
+        # id= "intial_id",
+        # sender="",
+        # channel_values={},
+        # v=0,
+        # ts="",
+        # channel_versions={},
+        # versions_seen={},
+        # pending_sends=[],
+        # thread_ts=''
+    )
+    
+    
+    interpreter = get_interpreter_node()
+    
+    res = interpreter(state)
+    print("Interpreter result:", res)
+    
+    if res.get('interpreted') != 'Activate':
+        return {"generated": res.get('interpreted')}
+    
     planner = get_plan_node()
     researcher = get_research_plan_node()
     grader = get_grader_node()
@@ -51,8 +88,9 @@ def process_user_input(user_data):
     graph = workflow.compile(checkpointer=postgres_checkpointer)
 
     thread = {"configurable": {"thread_id": "1"}}
+
     state = AgentState(
-        task=user_data['text'],
+        task=text,
         plan="",
         generated="", 
         content=[],
@@ -63,21 +101,42 @@ def process_user_input(user_data):
         search_number=0,
         max_searches=1, # Adjust (2-3 recommended)
         max_revisions=1, # Adjust (2-3 recommended)
-        use_saved_data=True 
+        use_saved_data=False,
+        history=[],
+        # id= "intial_id",
+        # sender="",
+        # channel_values={},
+        # v=0,
+        # ts="",
+        # channel_versions={},
+        # versions_seen={},
+        # pending_sends=[],
+        # thread_ts=''
     )
+    
+     # Print out state to ensure it's correct
+     
+    for key, value in state.items():
+        print(f"State key: {key}, Value: {value}")
 
-    for event in graph.stream(state, thread):
-        print('------------------')
-        # print(event)
-        print('------------------')
+    print("State before running planner:", state)
 
-    results = retrieve_final_data()
+    # If you suspect the issue is with the workflow or the planner function:
+    planner_output =  planner(state)  # Or however you invoke the planner
 
+    print("Planner output:", planner_output)
+    
+
+    ress = graph.invoke(state, thread)
+
+    print(ress)
+    
+    res = retrieve_final_data()
     # Send the saved data to the server
-    send_data_to_server(results)
+    send_data_to_server(res)
 
     # Return the processed result
-    return results 
+    return res 
 
 if __name__ == "__main__":
     # standalone Testing

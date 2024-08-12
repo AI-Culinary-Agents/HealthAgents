@@ -1,3 +1,4 @@
+
 import json
 import os
 from dotenv import load_dotenv
@@ -8,22 +9,29 @@ load_dotenv()
 from .prompts import GENERATOR_PROMPT
 
 def generator_node(state):
-    from graph import model  # avoid circular import
+    from graph import model, add_history  # avoid circular import
     from graph.status_updates import update_server_during_generator
+    
     # Directory to save/load generated content
     directory = os.environ.get("GENERATED_DATA_DIR", "../tests/meal_plan_save")
     filename = os.path.join(directory, "generated.json")
     update_server_during_generator()
+    
     if not os.path.exists(directory):
         os.makedirs(directory)
     
     # Use saved data if available
-    if state["use_saved_data"] and os.path.exists(filename):
-        print("From saved data!")
-        with open(filename, 'r') as file:
-            saved_data = json.load(file)
-            return {"generated": saved_data["generated"], "revision_number": state.get("revision_number", 1) + 1}
-        
+    # if state["use_saved_data"] and os.path.exists(filename):
+    #     print("From saved data!")
+    #     with open(filename, 'r') as file:
+    #         saved_data = json.load(file)
+    #         add_history(state, "generator", saved_data["generated"])
+    #         return {
+    #             "generated": saved_data["generated"],
+    #             "revision_number": state.get("revision_number", 1) + 1,
+    #             "history": state["history"]
+    #         }
+    
     # Combine all content into a single string
     content = "\n\n".join(state['content'] or [])
     
@@ -44,15 +52,19 @@ def generator_node(state):
         json.dump({"generated": response.content}, file)
     state['generated'] = response.content
     
+    # Update history with the generated content
+    add_history(state, "generator", response.content)
+    
     print("------GENERATOR------")
     return {
         "generated": response.content,
-        "revision_number": state.get("revision_number", 1) + 1
+        "revision_number": state.get("revision_number", 1) + 1,
+        "history": state["history"]
     }
     
 # Test
-# if __name__ == "__main__":
-#     from graph import AgentState  # avoid circular import
+if __name__ == "__main__":
+    from graph import AgentState  # avoid circular import
 
 #     state: AgentState = {
 #         "task": "I want to eat healthy and lose weight but I like pizza and donuts. I have a preference for greasy meals and I'm allergic to nuts and bananas.",

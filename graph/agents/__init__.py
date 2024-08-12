@@ -1,4 +1,9 @@
 # Delayed import to avoid circular dependencies
+
+def get_interpreter_node():
+    from .interpreter import interpreter_node
+    return interpreter_node
+
 def get_plan_node():
     from .planner import plan_node
     return plan_node

@@ -71,3 +71,7 @@ def manage_saved_data(directory_env_var, default_directory, filename, state, key
         state[key] = response_content
     
     return state
+
+def add_history(state,agent, history):
+    state['history'].append(f'Agent: {agent} - {history}')
+    return state

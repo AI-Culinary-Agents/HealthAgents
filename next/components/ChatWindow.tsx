@@ -34,13 +34,17 @@ const ChatWindow: React.FC<{
 						try {
 							// Parse and format the bot message if it's in JSON format
 							const parsedMessage = JSON.parse(formattedMessage);
-							formattedMessage = `${
-								parsedMessage.generated
-							}\n\nGrading Score: ${
-								parsedMessage.grading_score
-							}% (Relevance of the data used relative to input)\nHellucination Score: ${Math.round(
-								parsedMessage.hellucination_score
-							)}% (Likelihood of information made up by the model)`;
+							formattedMessage = parsedMessage.generated;
+
+							// Only append grading score and hallucination score if they exist
+							if (parsedMessage.grading_score !== undefined) {
+								formattedMessage += `\n\nGrading Score: ${parsedMessage.grading_score}% (Relevance of the data used relative to input)`;
+							}
+							if (parsedMessage.hellucination_score !== undefined) {
+								formattedMessage += `\nHellucination Score: ${Math.round(
+									parsedMessage.hellucination_score
+								)}% (Likelihood of information made up by the model)`;
+							}
 						} catch (e) {
 							console.warn('Failed to parse bot message JSON', e);
 						}
@@ -118,11 +122,21 @@ const ChatWindow: React.FC<{
 
 				const botMessageId = newMessageId + 1;
 
+				let botMessageText = generated;
+
+				// Only append grading score and hallucination score if they exist
+				if (grading_score !== undefined) {
+					botMessageText += `\n\nGrading Score: ${grading_score}% (Relevance of the data used relative to input)`;
+				}
+				if (hellucination_score !== undefined) {
+					botMessageText += `\nHellucination Score: ${Math.round(
+						hellucination_score
+					)}% (Likelihood of information made up by the model)`;
+				}
+
 				const botMessage: Message = {
 					messageId: botMessageId,
-					text: `${generated}\n\nGrading Score: ${grading_score}% (Relevance of the data used relative to input)\nHellucination Score: ${Math.round(
-						hellucination_score
-					)}% (Likelihood of information made up by the model)`,
+					text: botMessageText,
 					sender: 'bot',
 					threadid: currentThread,
 					userId: userId,
