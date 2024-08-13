@@ -37,9 +37,14 @@ def plan_node(state, use_saved_data: bool = False):
     # Save the plan
     with open(filename, 'w') as file:
         json.dump({"plan": response.content}, file)
+        
+    # update history with user input 
+    
+    add_history(state, "USER INPUT", state['task'])
 
     # Update history with the plan
     add_history(state, "planner", response.content)
+    
 
     print("-----PLANNER------")
     return {"plan": response.content, "history": state["history"]}
