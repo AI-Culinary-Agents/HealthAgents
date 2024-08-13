@@ -23,6 +23,7 @@ const Sidebar = () => {
 					created_by: session.user.id, // Use session user id directly
 				});
 				const newThreadId = response.data.threadId;
+				console.log('New thread ID:', newThreadId);
 				setThreads((prevThreads: any) => [
 					...prevThreads,
 					{ id: newThreadId, name: newThreadName },

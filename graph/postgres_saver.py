@@ -1,5 +1,6 @@
 """Implementation of a langgraph checkpoint saver using Postgres."""
 from contextlib import asynccontextmanager, contextmanager
+import threading
 from typing import (
     Any,
     AsyncGenerator,
@@ -19,7 +20,15 @@ from langgraph.serde.jsonplus import JsonPlusSerializer
 from langgraph.checkpoint.base import Checkpoint, CheckpointMetadata, CheckpointTuple
 from psycopg_pool import AsyncConnectionPool, ConnectionPool
 
-
+class SafeConnectionPool(ConnectionPool):
+    def __del__(self):
+        try:
+            if threading.current_thread() is not threading.main_thread():
+                return  # Skip cleanup in non-main threads to avoid join issues
+            super().__del__()
+        except RuntimeError as e:
+            print(f"Error during connection pool cleanup: {e}")
+            
 class JsonAndBinarySerializer(JsonPlusSerializer):
     def _default(self, obj):
         if isinstance(obj, (bytes, bytearray)):

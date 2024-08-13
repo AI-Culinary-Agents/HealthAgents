@@ -9,6 +9,7 @@ import { initializeEventSource } from '@/utils/utils';
 
 const Thread = ({ user }: { user: Record<string, string> }) => {
 	const { id } = useParams();
+	console.log(id);
 	const [isWaiting, setIsWaiting] = useState(false);
 	const [status, setStatus] = useState<string | null>(null);
 	console.log(user);
@@ -38,7 +39,7 @@ const Thread = ({ user }: { user: Record<string, string> }) => {
 					<div className='flex flex-col w-full'>
 						<ChatWindow
 							userId={user.id}
-							currentThread={+id[0]}
+							currentThread={Number(id)}
 							setIsWaiting={setIsWaiting}
 							setStatus={setStatus}
 						/>

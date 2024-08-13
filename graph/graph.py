@@ -1,8 +1,9 @@
+
 from psycopg_pool import ConnectionPool
 from graph.agents import get_plan_node, get_research_plan_node, get_grader_node, get_generator_node, get_reviewer_node, get_interpreter_node
 from langgraph.graph import StateGraph, END
 from graph import AgentState, send_data_to_server, retrieve_final_data  # avoid circular import
-from .postgres_saver import PostgresSaver
+from .postgres_saver import PostgresSaver, SafeConnectionPool
 
 def process_user_input(data):
     print("Starting process_user_input with:", data)  
@@ -41,8 +42,8 @@ def process_user_input(data):
     res = interpreter(state)
     print("Interpreter result:", res)
     
-    if res.get('interpreted') != 'Activate':
-        return {"generated": res.get('interpreted')}
+    if res != 'Activate':
+        return {"generated": res}
     
     planner = get_plan_node()
     researcher = get_research_plan_node()
@@ -80,14 +81,14 @@ def process_user_input(data):
 
     # Setup PostgreSQL checkpointer with sync connection pool
     DB_URI = "postgresql://postgres:postgres@localhost:5432/postgres?sslmode=disable"
-    pool = ConnectionPool(conninfo=DB_URI, max_size=20)
+    pool = SafeConnectionPool(conninfo=DB_URI, max_size=20)
     postgres_checkpointer = PostgresSaver(sync_connection=pool)
 
     postgres_checkpointer.create_tables(pool)
     
     graph = workflow.compile(checkpointer=postgres_checkpointer)
 
-    thread = {"configurable": {"thread_id": "1"}}
+    thread = {"configurable": {"thread_id": thread_id}}
 
     state = AgentState(
         task=text,

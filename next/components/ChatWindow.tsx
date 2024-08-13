@@ -20,6 +20,7 @@ const ChatWindow: React.FC<{
 
 	// Fetch messages from the database when the component mounts
 	useEffect(() => {
+		console.log('Fetching messages for thread:', currentThread);
 		const fetchMessages = async () => {
 			try {
 				const response = await axios.get(
