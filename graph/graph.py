@@ -65,7 +65,7 @@ def process_user_input(data):
     workflow.add_edge("generate", "review")
 
     def enough_content(state):
-        if state['grading_score'] >= 20 and state["search_number"] < state["max_searches"]:
+        if state['grading_score'] < 20 and state["search_number"] < state["max_searches"]:
             return "research_plan"
         return "generate"
     
