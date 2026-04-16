@@ -72,7 +72,7 @@ def process_user_input(data):
     workflow.add_conditional_edges("grader", enough_content, {"research_plan": "research_plan", "generate": "generate"})
 
     def should_continue(state):
-        if state['hellucination_score'] <= 50 and state["revision_number"] < state["max_revisions"]:
+        if state['hellucination_score'] > 50 and state["revision_number"] < state["max_revisions"]:
             return "generate"
         return END
 
