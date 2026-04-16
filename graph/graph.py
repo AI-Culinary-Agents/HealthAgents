@@ -7,7 +7,7 @@ from .postgres_saver import PostgresSaver
 def process_user_input(data):
     print("Starting process_user_input with:", data)  
     text = data['text']
-    thread_id = str(data['threadid'])
+    thread_id = f"thread_{data['threadid']}"
     
     state = AgentState(
         task=text,
@@ -87,22 +87,23 @@ def process_user_input(data):
     
     graph = workflow.compile(checkpointer=postgres_checkpointer)
 
-    thread = {"configurable": {"thread_id": "1"}}
+    thread = {"configurable": {"thread_id": thread_id}}
 
     state = AgentState(
         task=text,
         plan="",
-        generated="", 
+        generated="",
         content=[],
-        grading_score=0, 
-        revision_number=0, 
+        grading_score=0,
+        revision_number=0,
         final_review="",
-        hellucination_score=0,  
+        hellucination_score=0,
         search_number=0,
         max_searches=1, # Adjust (2-3 recommended)
         max_revisions=1, # Adjust (2-3 recommended)
         use_saved_data=False,
         history=[],
+        thread_id=thread_id,
         # id= "intial_id",
         # sender="",
         # channel_values={},

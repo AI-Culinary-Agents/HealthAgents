@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout';
 import ChatWindow from '@/components/ChatWindow';
 import LoadingScreen from '@/components/LoadingScreen';
 import { initializeEventSource } from '@/utils/utils';
@@ -38,7 +38,7 @@ const Thread = ({ user }: { user: Record<string, string> }) => {
 					<div className='flex flex-col w-full'>
 						<ChatWindow
 							userId={user.id}
-							currentThread={+id[0]}
+							currentThread={+id}
 							setIsWaiting={setIsWaiting}
 							setStatus={setStatus}
 						/>

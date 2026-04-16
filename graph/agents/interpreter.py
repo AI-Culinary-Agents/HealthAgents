@@ -38,7 +38,10 @@ def retrieve_last_state(checkpointer, config):
 def interpreter_node(state, use_saved_data: bool = False):
     config = {"configurable": {"thread_id": state['thread_id']}}
     checkpointer, _ = setup_db()
-    context = retrieve_last_state(checkpointer, config)
+    try:
+        context = retrieve_last_state(checkpointer, config)
+    except ValueError:
+        context = None
     print("Context:", context)
     directory = os.environ.get("INTERPRETER_DATA_DIR", "../tests/interpreter_save")
     filename = os.path.join(directory, "interpreted_data.json")
@@ -141,11 +144,9 @@ def interpreter_node(state, use_saved_data: bool = False):
     config = {"configurable": {"thread_id": state['thread_id']}}
 
     context = checkpointer.get(config)
-
-    if context is None:
-        raise ValueError(f"No checkpoint found for thread_id: {state['thread_id']}")
-
-    history = context.get('channel_values', {}).get('history', [])
+    history = []
+    if context is not None:
+        history = context.get('channel_values', {}).get('history', [])
 
     print("🚀 ~ Retrieved context:", context)
     print("History:", history)
